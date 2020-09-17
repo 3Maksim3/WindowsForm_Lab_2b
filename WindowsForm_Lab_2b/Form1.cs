@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -9,7 +10,11 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace WindowsForm_Lab_2b {
-    public partial class Form1 : Form {
+    public partial class Form1 : Form 
+    {
+        Ctriangle[] c1;
+        EquilateralCtriangle[] eq1;
+
         public Form1() {
             InitializeComponent();
         }
@@ -35,6 +40,8 @@ namespace WindowsForm_Lab_2b {
                     } while (!number.isCtriangle(ctriangles, i));
                 }
 
+                
+
                 for (int i = 0; i < equilateralctriangles.Length; i++)
                 {
                     do
@@ -55,7 +62,7 @@ namespace WindowsForm_Lab_2b {
                     } while (!count.isCorrect(equilateralctriangles, i));
                 }
 
-
+                
 
                 richTextBox1.Text += "--------------------------------------------------------------------------------------------------\n";
                 richTextBox1.Text +=  $"Средняя площадь всех {Convert.ToInt32(textBox1.Text)} треугольников = " + Math.Round(number.findMiddleSquare(ctriangles)) + "\n";
@@ -108,6 +115,87 @@ namespace WindowsForm_Lab_2b {
             richTextBox2.Clear();
         }
 
+        private void button3_Click(object sender, EventArgs e)
+        {
+            if (textBox1.Text == String.Empty && textBox2.Text == String.Empty)
+            {
+                MessageBox.Show("Нет данных для сохранения!");
+            }
+            else
+            {
+                SaveFileDialog save = new SaveFileDialog();
+                save.DefaultExt = "*.bin";
+                save.Filter = "Binary files (*.bin) | *.bin";
+                save.AddExtension = true;
+                if (save.ShowDialog() == DialogResult.OK)
+                {
+                    string filename = save.FileName;
+                    FileStream fs = new FileStream(filename, FileMode.OpenOrCreate, FileAccess.Write);
+                    BinaryWriter bw = new BinaryWriter(fs, Encoding.UTF8);
+                    bw.Write(c1.Length);
+                    bw.Write(eq1.Length);
+                    for (int i = 0; i < c1.Length; i++)
+                    {
+                        c1[i].Write(bw);
+                    }
+                    for (int i = 0; i < eq1.Length; i++)
+                    {
+                        eq1[i].Write(bw);
+                    }
+                    bw.Close();
+                    fs.Close();
+                }
+            }
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            if (textBox1.Text != String.Empty)
+            {
+                MessageBox.Show("Textbox must be empty!\nClear textbox to load data.");
+            }
+            else
+            {
+                OpenFileDialog open = new OpenFileDialog();
+                open.DefaultExt = "*.bin";
+                open.Filter = "Binary files (*.bin) | *.bin";
+                open.AddExtension = true;
+                if (open.ShowDialog() == DialogResult.OK)
+                {
+                    string filename = open.FileName;
+                    FileStream fs = new FileStream(filename, FileMode.Open, FileAccess.Read);
+                    BinaryReader br = new BinaryReader(fs, Encoding.UTF8);
+                    for (int i = 0; i < c1.Length; i++)
+                    {
+                        c1[i] = new Ctriangle();
+                        c1[i] = c1[i].Read(br);
+                    }
+                    for (int i = 0; i < eq1.Length; i++)
+                    {
+                        eq1[i] = new EquilateralCtriangle();
+                        eq1[i] = eq1[i].Read(br);
+                    }
+                    br.Close();
+                    fs.Close();
+                }
+            }
+        }
+
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (textBox1.Text != String.Empty && textBox2.Text != String.Empty)
+            {
+                var result = MessageBox.Show("Хотите записать данные в файл?", "Выход", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+                if (result == DialogResult.Yes)
+                {
+                    button3_Click(sender, e);
+                }
+                if (result == DialogResult.Cancel)
+                {
+                    e.Cancel = true;
+                }
+            }
+        }
     }
 
     class Ctriangle
@@ -175,6 +263,39 @@ namespace WindowsForm_Lab_2b {
 
             return middle;
         }
+
+        public void Write(BinaryWriter bw)
+        {
+            bw.Write(Side1);
+            bw.Write(Side2);
+            bw.Write(Side3);
+            bw.Write(GetAngle1(Side1, Side2, Side3));
+            bw.Write(GetAngle2(Side1, Side2, Side3));
+            bw.Write(GetAngle3(Side1, Side2, Side3));
+            bw.Write(GetPerimetr(Side1, Side2, Side3));
+            bw.Write(GetSquare(Side1, Side2, Side3));
+        }
+
+        public Ctriangle Read(BinaryReader br)
+        {
+            Ctriangle st = new Ctriangle();
+
+            st.Side1 = br.ReadDouble();
+            st.Side2 = br.ReadDouble();
+            st.Side3 = br.ReadDouble();
+            double a = st.GetAngle1(st.Side1, st.Side2, st.Side3);
+            a = br.ReadDouble();
+            double b = st.GetAngle2(st.Side1, st.Side2, st.Side3);
+            b = br.ReadDouble();
+            double c = st.GetAngle3(st.Side1, st.Side2, st.Side3);
+            c = br.ReadDouble();
+            double d = st.GetPerimetr(st.Side1, st.Side2, st.Side3);
+            d = br.ReadDouble();
+            double e = st.GetSquare(st.Side1, st.Side2, st.Side3);
+            e = br.ReadDouble();
+
+            return st;
+        }
     }
 
     class EquilateralCtriangle : Ctriangle
@@ -225,6 +346,39 @@ namespace WindowsForm_Lab_2b {
                         max = arr[i].GetSquare(arr[i].Side1, arr[i].Side2, arr[i].Side3);
                 }
             return max;
+        }
+        public void Write(BinaryWriter bf)
+        {
+            bf.Write(Side1);
+            bf.Write(Side2);
+            bf.Write(Side3);
+            bf.Write(GetAngle1(Side1, Side2, Side3));
+            bf.Write(GetAngle2(Side1, Side2, Side3));
+            bf.Write(GetAngle3(Side1, Side2, Side3));
+            bf.Write(GetPerimetr(Side1, Side2, Side3));
+            bf.Write(GetSquare(Side1, Side2, Side3));
+        }
+    
+
+        public EquilateralCtriangle Read(BinaryReader bf)
+        {
+            EquilateralCtriangle qt = new EquilateralCtriangle();
+
+            qt.Side1 = bf.ReadDouble();
+            qt.Side2 = bf.ReadDouble();
+            qt.Side3 = bf.ReadDouble();
+            double a = qt.GetAngle1(qt.Side1, qt.Side2, qt.Side3);
+            a = bf.ReadDouble();
+            double b = qt.GetAngle2(qt.Side1, qt.Side2, qt.Side3);
+            b = bf.ReadDouble();
+            double c = qt.GetAngle3(qt.Side1, qt.Side2, qt.Side3);
+            c = bf.ReadDouble();
+            double d = qt.GetPerimetr(qt.Side1, qt.Side2, qt.Side3);
+            d = bf.ReadDouble();
+            double e = qt.GetSquare(qt.Side1, qt.Side2, qt.Side3);
+            e = bf.ReadDouble();
+
+            return qt;
         }
     }
 
