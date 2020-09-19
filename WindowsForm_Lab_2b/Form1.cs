@@ -9,39 +9,38 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace WindowsForm_Lab_2b {
+namespace WindowsForm_Lab_2b 
+{
     public partial class Form1 : Form 
     {
-        Ctriangle[] c1;
-        EquilateralCtriangle[] eq1;
-
         public Form1() {
             InitializeComponent();
         }
 
-        private void button1_Click(object sender, EventArgs e) {
-            try {
-                Ctriangle number = new Ctriangle();
+        private void button1_Click(object sender, EventArgs e) 
+        {
+            // Проверка на корректность вводимых значений
+            try
+            {
+                Ctriangle number = new Ctriangle(); // Создаем обьект класса
 
-                EquilateralCtriangle count = new EquilateralCtriangle();
+                EquilateralCtriangle count = new EquilateralCtriangle(); // Создаем объект класса
 
-                Ctriangle[] ctriangles = new Ctriangle[Convert.ToInt32(textBox1.Text)];
+                Ctriangle[] ctriangles = new Ctriangle[Convert.ToInt32(textBox1.Text)]; // Создаем массив объектов
 
-                EquilateralCtriangle[] equilateralctriangles = new EquilateralCtriangle[Convert.ToInt32(textBox2.Text)];
+                EquilateralCtriangle[] equilateralctriangles = new EquilateralCtriangle[Convert.ToInt32(textBox2.Text)]; // Создаем массив объектов
 
-                Random random = new Random();
-
+                Random random = new Random(); // Создаем объект класса Random
+                // Заполняем массив значениями 
                 for (int i = 0; i < ctriangles.Length; i++) {
                     do {
                         ctriangles[i] = new Ctriangle();
                         ctriangles[i].Side1 = random.Next(10, 15);
                         ctriangles[i].Side2 = random.Next(10, 15);
                         ctriangles[i].Side3 = random.Next(2, 20);
-                    } while (!number.isCtriangle(ctriangles, i));
+                    } while (!number.isCtriangle(ctriangles, i)); // Проверяем значения на корректность
                 }
-
-                
-
+                // Заполняем массив значениями
                 for (int i = 0; i < equilateralctriangles.Length; i++)
                 {
                     do
@@ -51,28 +50,28 @@ namespace WindowsForm_Lab_2b {
 
                         do {
                             equilateralctriangles[i].Side2 = random.Next(6, 15);
-                        } while (!(equilateralctriangles[i].Side2 == equilateralctriangles[i].Side1));
+                        } while (!(equilateralctriangles[i].Side2 == equilateralctriangles[i].Side1)); // Проверяем значения на корректность
 
                         do
                         {
                             equilateralctriangles[i].Side3 = random.Next(6, 15);
-                        } while (!(equilateralctriangles[i].Side3 == equilateralctriangles[i].Side1));
+                        } while (!(equilateralctriangles[i].Side3 == equilateralctriangles[i].Side1)); // Проверяем значения на корректность
 
 
-                    } while (!count.isCorrect(equilateralctriangles, i));
+                    } while (!count.isCorrect(equilateralctriangles, i)); // Проверяем значения на корректность
                 }
 
-                
 
+                // Выводим среднее значение площадей обычных треугольников
                 richTextBox1.Text += "--------------------------------------------------------------------------------------------------\n";
                 richTextBox1.Text +=  $"Средняя площадь всех {Convert.ToInt32(textBox1.Text)} треугольников = " + Math.Round(number.findMiddleSquare(ctriangles)) + "\n";
                 richTextBox1.Text += "--------------------------------------------------------------------------------------------------";
-
+                // Выводим максимальную площадь равносторонних треугольников
                 richTextBox2.Text += "--------------------------------------------------------------------------------------------------\n";
                 richTextBox2.Text += $"Наибольшая площадь среди {Convert.ToInt32(textBox2.Text)} р-них треугольников = " + Math.Round(count.findMaxSquare(equilateralctriangles)) + "\n";
                 richTextBox2.Text += "--------------------------------------------------------------------------------------------------";
 
-
+                // Выводим информацию обо всех обычних треугольниках 
                 for (int i = 0; i < ctriangles.Length; i++) {
                     richTextBox1.Text += "\n";
                     richTextBox1.Text += $"Информация об треугольнике под номером {i + 1}\n";
@@ -85,7 +84,7 @@ namespace WindowsForm_Lab_2b {
                     richTextBox1.Text += "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
                     richTextBox1.Text += $"Площадь = {Math.Round(ctriangles[i].GetSquare(ctriangles[i].Side1, ctriangles[i].Side2, ctriangles[i].Side3))}\n";
                 }
-
+                // Выводим информацию обо всех обычних треугольниках
                 for (int i = 0; i < ctriangles.Length; i++)
                 {
                     richTextBox2.Text += "\n";
@@ -101,7 +100,7 @@ namespace WindowsForm_Lab_2b {
                 }
             }
             catch (Exception exc) {
-                MessageBox.Show(exc.Message);
+                MessageBox.Show(exc.Message); // Выводим сообщение об ошибке
             }
 
             Console.ReadLine();
@@ -109,109 +108,30 @@ namespace WindowsForm_Lab_2b {
 
         private void button2_Click(object sender, EventArgs e)
         {
-            textBox1.Clear();
+            // Очищаем все вводимые и выводимые боксы
+            textBox1.Clear(); 
             textBox2.Clear();
             richTextBox1.Clear();
             richTextBox2.Clear();
         }
 
-        private void button3_Click(object sender, EventArgs e)
-        {
-            if (textBox1.Text == String.Empty && textBox2.Text == String.Empty)
-            {
-                MessageBox.Show("Нет данных для сохранения!");
-            }
-            else
-            {
-                SaveFileDialog save = new SaveFileDialog();
-                save.DefaultExt = "*.bin";
-                save.Filter = "Binary files (*.bin) | *.bin";
-                save.AddExtension = true;
-                if (save.ShowDialog() == DialogResult.OK)
-                {
-                    string filename = save.FileName;
-                    FileStream fs = new FileStream(filename, FileMode.OpenOrCreate, FileAccess.Write);
-                    BinaryWriter bw = new BinaryWriter(fs, Encoding.UTF8);
-                    bw.Write(c1.Length);
-                    bw.Write(eq1.Length);
-                    for (int i = 0; i < c1.Length; i++)
-                    {
-                        c1[i].Write(bw);
-                    }
-                    for (int i = 0; i < eq1.Length; i++)
-                    {
-                        eq1[i].Write(bw);
-                    }
-                    bw.Close();
-                    fs.Close();
-                }
-            }
-        }
-
-        private void button4_Click(object sender, EventArgs e)
-        {
-            if (textBox1.Text != String.Empty)
-            {
-                MessageBox.Show("Textbox must be empty!\nClear textbox to load data.");
-            }
-            else
-            {
-                OpenFileDialog open = new OpenFileDialog();
-                open.DefaultExt = "*.bin";
-                open.Filter = "Binary files (*.bin) | *.bin";
-                open.AddExtension = true;
-                if (open.ShowDialog() == DialogResult.OK)
-                {
-                    string filename = open.FileName;
-                    FileStream fs = new FileStream(filename, FileMode.Open, FileAccess.Read);
-                    BinaryReader br = new BinaryReader(fs, Encoding.UTF8);
-                    for (int i = 0; i < c1.Length; i++)
-                    {
-                        c1[i] = new Ctriangle();
-                        c1[i] = c1[i].Read(br);
-                    }
-                    for (int i = 0; i < eq1.Length; i++)
-                    {
-                        eq1[i] = new EquilateralCtriangle();
-                        eq1[i] = eq1[i].Read(br);
-                    }
-                    br.Close();
-                    fs.Close();
-                }
-            }
-        }
-
-        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            if (textBox1.Text != String.Empty && textBox2.Text != String.Empty)
-            {
-                var result = MessageBox.Show("Хотите записать данные в файл?", "Выход", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
-                if (result == DialogResult.Yes)
-                {
-                    button3_Click(sender, e);
-                }
-                if (result == DialogResult.Cancel)
-                {
-                    e.Cancel = true;
-                }
-            }
-        }
     }
 
     class Ctriangle
     {
+        // Обьявляем переменные
         private double lengthside1;
         private double lengthside2;
         private double lengthside3;
         double Angle1, Angle2, Angle3;
-
+        // Свойства переменных
         public double Side1 { get => lengthside1; set => lengthside1 = (value > 0 ? value : 1); }
         public double Side2 { get => lengthside2; set => lengthside2 = (value > 0 ? value : 1); }
         public double Side3 { get => lengthside3; set => lengthside3 = (value > 0 ? value : 1); }
         public double Angle11 { get => Angle1; set => Angle1 = value; }
         public double Angle21 { get => Angle2; set => Angle2 = value; }
         public double Angle31 { get => Angle3; set => Angle3 = value; }
-
+        // Метод на проверку существования треугольника
         public bool isCtriangle(Ctriangle[] arr, int i)
         {
             if ((arr[i].Side1 + arr[i].Side2) > arr[i].Side3)
@@ -219,38 +139,33 @@ namespace WindowsForm_Lab_2b {
             else
                 return false;
         }
-
+        // Метод вычисления угла
         public double GetAngle1(double Side1, double Side2, double Side3)
         {
             return Angle11 = Math.Cos((Math.Pow(Side1, 2) + Math.Pow(Side3, 2) - Math.Pow(Side2, 2)) / (2 * Side1 * Side3));
         }
-
+        // Метод вычисления угла
         public double GetAngle2(double Side1, double Side2, double Side3)
         {
             return Angle21 = Math.Cos((Math.Pow(Side1, 2) + Math.Pow(Side2, 2) - Math.Pow(Side3, 2)) / (2 * Side1 * Side3));
         }
-
+        // Метод вычисления угла
         public double GetAngle3(double Side1, double Side2, double Side3)
         {
             return Angle31 = Math.Cos((Math.Pow(Side2, 2) + Math.Pow(Side3, 2) - Math.Pow(Side1, 2)) / (2 * Side1 * Side3));
         }
-
+        // Метод вычисления периметра
         public double GetPerimetr(double Side1, double Side2, double Side3)
         {
             return Side1 + Side2 + Side3;
         }
-
+        // Метод вычисления площади
         public double GetSquare(double Side1, double Side2, double Side3)
         {
             double p = (Side1 + Side2 + Side3) / 2;
             return Math.Sqrt(p * (p - Side1) * (p - Side2) * (p - Side3));
         }
-
-        public string PrintCtriangle(double Side1, double Side2, double Side3)
-        {
-            return $"Default Ctriangle:\nSide1 = {Side1} ; Side2 = {Side2} ; Side3 = {Side3} \nAngles = {GetAngle1(Side1, Side2, Side3)} ; {GetAngle2(Side1, Side2, Side3)} ; {GetAngle3(Side1, Side2, Side3)} \nPerimetr = {GetPerimetr(Side1, Side2, Side3)} ; Square = {GetSquare(Side1, Side2, Side3)}";
-        }
-
+        // Метод находящий среднее арифметическое всех площадей
         public double findMiddleSquare(Ctriangle[] arr)
         {
             double middle = 0;
@@ -264,54 +179,23 @@ namespace WindowsForm_Lab_2b {
             return middle;
         }
 
-        public void Write(BinaryWriter bw)
-        {
-            bw.Write(Side1);
-            bw.Write(Side2);
-            bw.Write(Side3);
-            bw.Write(GetAngle1(Side1, Side2, Side3));
-            bw.Write(GetAngle2(Side1, Side2, Side3));
-            bw.Write(GetAngle3(Side1, Side2, Side3));
-            bw.Write(GetPerimetr(Side1, Side2, Side3));
-            bw.Write(GetSquare(Side1, Side2, Side3));
-        }
-
-        public Ctriangle Read(BinaryReader br)
-        {
-            Ctriangle st = new Ctriangle();
-
-            st.Side1 = br.ReadDouble();
-            st.Side2 = br.ReadDouble();
-            st.Side3 = br.ReadDouble();
-            double a = st.GetAngle1(st.Side1, st.Side2, st.Side3);
-            a = br.ReadDouble();
-            double b = st.GetAngle2(st.Side1, st.Side2, st.Side3);
-            b = br.ReadDouble();
-            double c = st.GetAngle3(st.Side1, st.Side2, st.Side3);
-            c = br.ReadDouble();
-            double d = st.GetPerimetr(st.Side1, st.Side2, st.Side3);
-            d = br.ReadDouble();
-            double e = st.GetSquare(st.Side1, st.Side2, st.Side3);
-            e = br.ReadDouble();
-
-            return st;
-        }
     }
 
     class EquilateralCtriangle : Ctriangle
     {
+        // Объявляем переменные
         private double lengthside1;
         private double lengthside2;
         private double lengthside3;
         double Angle1, Angle2, Angle3;
-
+        // Свойства переменных
         public double Lengthside1 { get => lengthside1; set => lengthside1 = (value > 0 ? value : 1); }
         public double Lengthside2 { get => lengthside2; set => lengthside2 = (value > 0 ? value : 1); }
         public double Lengthside3 { get => lengthside3; set => lengthside3 = (value > 0 ? value : 1); }
         public double Angle12 { get => Angle1; set => Angle1 = value; }
         public double Angle22 { get => Angle2; set => Angle2 = value; }
         public double Angle32 { get => Angle3; set => Angle3 = value; }
-
+        // Метод на проверку свойства треугольника
         public bool isCorrect(EquilateralCtriangle[] arr, int i)
         {
             if (Lengthside1 == Lengthside2 && Lengthside1 == Lengthside3 && Lengthside2 == Lengthside3)
@@ -319,22 +203,17 @@ namespace WindowsForm_Lab_2b {
             else
                 return false;
         }
-
+        // Метод вычисления периметра
         new public double GetPerimetr(double Lengthside1, double Lengthside2, double Lengthside3)
         {
             return base.GetPerimetr(Lengthside1, Lengthside2, Lengthside3);
         }
-
+        // Метод вычисления площади
         new public double GetSquare(double Lengthside1, double Lengthside2, double Lengthside3)
         {
             return base.GetSquare(Lengthside1, Lengthside2, Lengthside3);
         }
-
-        new public string PrintCtriangle(double Lengthside1, double Lengthside2, double Lengthside3)
-        {
-            return $"Equilateral Ctriangle:\nSide1 = {Lengthside1} ; Side2 = {Lengthside2} ; Side3 = {Lengthside3} \nAngles = {GetAngle1(Lengthside1, Lengthside2, Lengthside3)} ; {GetAngle2(Lengthside1, Lengthside2, Lengthside3)} ; {GetAngle3(Lengthside1, Lengthside2, Lengthside3)} \nPerimetr = {GetPerimetr(Lengthside1, Lengthside2, Lengthside3)} ; Square = {GetSquare(Lengthside1, Lengthside2, Lengthside3)}";
-        }
-
+        // Метод находящий наибольший треугольник
         public double findMaxSquare(EquilateralCtriangle[] arr)
         {
             double max = 0;
@@ -347,40 +226,7 @@ namespace WindowsForm_Lab_2b {
                 }
             return max;
         }
-        public void Write(BinaryWriter bf)
-        {
-            bf.Write(Side1);
-            bf.Write(Side2);
-            bf.Write(Side3);
-            bf.Write(GetAngle1(Side1, Side2, Side3));
-            bf.Write(GetAngle2(Side1, Side2, Side3));
-            bf.Write(GetAngle3(Side1, Side2, Side3));
-            bf.Write(GetPerimetr(Side1, Side2, Side3));
-            bf.Write(GetSquare(Side1, Side2, Side3));
-        }
-    
-
-        public EquilateralCtriangle Read(BinaryReader bf)
-        {
-            EquilateralCtriangle qt = new EquilateralCtriangle();
-
-            qt.Side1 = bf.ReadDouble();
-            qt.Side2 = bf.ReadDouble();
-            qt.Side3 = bf.ReadDouble();
-            double a = qt.GetAngle1(qt.Side1, qt.Side2, qt.Side3);
-            a = bf.ReadDouble();
-            double b = qt.GetAngle2(qt.Side1, qt.Side2, qt.Side3);
-            b = bf.ReadDouble();
-            double c = qt.GetAngle3(qt.Side1, qt.Side2, qt.Side3);
-            c = bf.ReadDouble();
-            double d = qt.GetPerimetr(qt.Side1, qt.Side2, qt.Side3);
-            d = bf.ReadDouble();
-            double e = qt.GetSquare(qt.Side1, qt.Side2, qt.Side3);
-            e = bf.ReadDouble();
-
-            return qt;
-        }
+        
     }
-
 
 }
